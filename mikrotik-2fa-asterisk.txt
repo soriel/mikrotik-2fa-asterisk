@@ -1,0 +1,47 @@
+## You need to create log action fo work this script
+## /system logging create add memory-lines=2000 name=2fa target=memory
+## /system logging add action=2fa topics=radius
+## script on-dial in /ppp profile
+:local datetime [/system clock get date]
+:local time [/system clock get time]
+:local remoteAddr
+:local callerid
+:set remoteAddr $"remote-address"
+:set callerid $"caller-id"
+:local 2facomment; 
+
+:foreach line in=[/log find buffer=2fa (message~"MT-Wireless-Comment =")] do={
+ 
+  :do {:local content [/log get $line message];
+  #:put $content;
+  #:put [:len $content];
+  :local pos1add [:find $content " = " 0];
+  :if ([:len $pos1add] != 0) do={ 
+    #:put $pos1add;
+    :local pos2add [:len $content];
+    #:put $pos2add;
+    #:global 2facomment; 
+    if ([:len $pos2add] != 0) do={  
+      :set 2facomment [:pick $content ($pos1add+4) ($pos2add-1)];
+      :put "$2facomment";
+      };
+   };
+ };
+};
+
+delay 2;
+#/ip firewall address-list remove numbers=[find where comment=$2facomment list=vpnblocked]
+/ip firewall address-list add address=$remoteAddr list=vpnblocked timeout=200d comment=$"2facomment"
+/log info "VPN-con $datetime $time Connected user: $"2facomment" $"caller-id" $"remote-address""
+
+
+## Script on Down in /ppp profile
+/ip firewall address-list remove numbers=[find where comment~$user list=vpnblocked]
+
+:local callerId
+:local calledId
+:set callerId $"caller-id"
+:set calledId $"called-id"
+:local datetime [/system clock get date]
+:local time [/system clock get time]
+/log info "VPN-con $datetime $time Disconnected user: $user $callerId"
