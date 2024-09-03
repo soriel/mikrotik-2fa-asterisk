@@ -41,14 +41,19 @@
     \n    #:global 2facomment; \
     \n    if ([:len \$pos2add] != 0) do={  \
     \n      :set 2facomment [:pick \$content (\$pos1add+4) (\$pos2add-1)];\
-    \n      :put \"\$2facomment\";\
+    \n      #:put \"\$2facomment\";\
     \n      };\
     \n   };\
     \n };\
+    \n if ($2facomment ~ $user) do={
+    \n    delay 2;
+    \n     /ip firewall address-list add address=$remoteAddr list=vpnblocked timeout=200d comment=$"2facomment"
+    \n     /log info "VPN-con $datetime $time Connected user: $"2facomment" $"caller-id" $"remote-address""
+    \n  };\r\
     \n};\r\
     \n\r\
     \ndelay 2;\r\
     \n#/ip firewall address-list remove numbers=[find where comment=\$2facomment list=vpnblocked]\r\
-    \n/ip firewall address-list add address=\$remoteAddr list=vpnblocked timeout=200d comment=\$\"2facomment\"\r\
-    \n/log info \"VPN-con \$datetime \$time Connected user: \$\"2facomment\" \$\"caller-id\" \$\"remote-address\"\"" only-one=yes use-encryption=yes
+    \n#/ip firewall address-list add address=\$remoteAddr list=vpnblocked timeout=200d comment=\$\"2facomment\"\r\
+    \n#/log info \"VPN-con \$datetime \$time Connected user: \$\"2facomment\" \$\"caller-id\" \$\"remote-address\"\"" only-one=yes use-encryption=yes
 
