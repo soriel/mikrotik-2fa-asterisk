@@ -27,12 +27,17 @@
       };
    };
  };
+ if ($2facomment ~ $user) do={
+   delay 2;
+   /ip firewall address-list add address=$remoteAddr list=vpnblocked timeout=200d comment=$"2facomment"
+   /log info "VPN-con $datetime $time Connected user: $"2facomment" $"caller-id" $"remote-address""
+   };
 };
 
-delay 2;
+#delay 2;
 #/ip firewall address-list remove numbers=[find where comment=$2facomment list=vpnblocked]
-/ip firewall address-list add address=$remoteAddr list=vpnblocked timeout=200d comment=$"2facomment"
-/log info "VPN-con $datetime $time Connected user: $"2facomment" $"caller-id" $"remote-address""
+#/ip firewall address-list add address=$remoteAddr list=vpnblocked timeout=200d comment=$"2facomment"
+#/log info "VPN-con $datetime $time Connected user: $"2facomment" $"caller-id" $"remote-address""
 
 
 ## Script on Down in /ppp profile
