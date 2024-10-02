@@ -4,9 +4,9 @@
 ## Reset error.html
 /ip proxy reset-html
 ## Create firewall rules
+/ip firewall filter add action=accept chain=input comment="Allow 2fa for vpnblacked" dst-port=8080 protocol=tcp src-address-list=vpnblocked
 /ip firewall filter add action=reject chain=forward comment="Deny 2fa for vpnblacked" reject-with=icmp-admin-prohibited src-address-list=vpnblocked
 /ip firewall filter add action=reject chain=input comment="Deny 2fa for vpnblacked" reject-with=icmp-admin-prohibited src-address-list=vpnblocked
-/ip firewall filter add action=accept chain=input comment="Allow 2fa for vpnblacked" dst-port=8080 protocol=tcp src-address-list=vpnblocked
 /ip firewall nat add action=redirect chain=dstnat comment="Redirect to web-proxy for vpnblocked" dst-port=80 protocol=tcp src-address-list=vpnblocked to-ports=8080
 ## Confirure web proxy
 /ip proxy set cache-administrator=admin@example.com enabled=yes
